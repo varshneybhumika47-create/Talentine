@@ -5,7 +5,7 @@ import os
 from datetime import datetime
 from openai import OpenAI
 
-# ── Page config ──────────────────────────────────────────────────────────────
+
 st.set_page_config(
     page_title="💌 Digital Love Letter Generator",
     page_icon="💌",
@@ -13,7 +13,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# ── OpenAI ────────────────────────────────────────────────────────────────────
+
 try:
     
     OPENAI_AVAILABLE = True
@@ -28,7 +28,7 @@ def get_openai_client():
     return None
 
 
-# ── Database ──────────────────────────────────────────────────────────────────
+
 DB_PATH = "love_letters.db"
 
 
@@ -71,7 +71,7 @@ def load_letter(letter_id):
     return None
 
 
-# ── AI Generation ──────────────────────────────────────────────────────────────
+
 STYLE_DESCRIPTIONS = {
     "Romantic": "deeply romantic, heartfelt, with tender imagery and soft vulnerability",
     "Cute": "adorable, playful, warm and sweet like a morning hug",
@@ -120,7 +120,7 @@ Rules:
     return response.choices[0].message.content.strip()
 
 
-# ── Theme Definitions ─────────────────────────────────────────────────────────
+
 THEMES = {
     "Vintage parchment": {
         "bg": "#f5e6c8",
@@ -195,7 +195,7 @@ THEMES = {
 }
 
 
-# ── Global CSS ────────────────────────────────────────────────────────────────
+
 def inject_global_css():
     st.markdown("""
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -349,7 +349,7 @@ def inject_global_css():
     """, unsafe_allow_html=True)
 
 
-# ── Card HTML Renderer ─────────────────────────────────────────────────────────
+
 def render_letter_card(letter_text: str, theme_name: str, auto_open: bool = False) -> str:
     t = THEMES[theme_name]
     escaped = letter_text.replace("`", "\\`").replace("$", "\\$").replace("\\", "\\\\").replace("\n", "\\n")
@@ -797,17 +797,17 @@ if ('speechSynthesis' in window) {{
     return html
 
 
-# ── App Entry Point ────────────────────────────────────────────────────────────
+
 def main():
     init_db()
     inject_global_css()
 
-    # Check for shared letter view
+    
     params = st.query_params
     letter_id = params.get("id", None)
 
     if letter_id:
-        # ── Shared view ──
+        
         data = load_letter(letter_id)
         if data:
             st.markdown('<div class="love-title">💌 A Letter For You</div>', unsafe_allow_html=True)
@@ -820,13 +820,13 @@ def main():
             st.error("Letter not found. It may have been removed.")
         return
 
-    # ── Main App ──
+   
     import streamlit.components.v1 as components
 
     st.markdown('<div class="love-title">💌 Digital Love Letter Generator</div>', unsafe_allow_html=True)
     st.markdown('<div class="love-subtitle">Turn your feelings into poetry</div>', unsafe_allow_html=True)
 
-    # ── API Key ──
+    
     if not os.environ.get("OPENAI_API_KEY"):
         with st.expander("🔑 Set OpenAI API Key", expanded=not st.session_state.get("openai_key")):
             key_input = st.text_input("API Key", type="password", placeholder="sk-...", label_visibility="collapsed")
@@ -834,7 +834,7 @@ def main():
                 st.session_state["openai_key"] = key_input
                 st.success("Key saved for this session ✓")
 
-    # ── Step 1: Feelings ──
+    
     st.markdown('<div class="step-card"><div class="step-label">Step 1 — Your Feelings</div>', unsafe_allow_html=True)
     points = st.text_area(
         "Feelings",
@@ -844,7 +844,7 @@ def main():
     )
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # ── Step 2: Style & Intensity ──
+    
     st.markdown('<div class="step-card"><div class="step-label">Step 2 — Style & Emotion</div>', unsafe_allow_html=True)
     col1, col2 = st.columns([1.3, 1])
     with col1:
@@ -857,7 +857,7 @@ def main():
         intensity = st.slider("Love Intensity", 0, 100, 75)
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # ── Step 3: Theme ──
+    
     st.markdown('<div class="step-card"><div class="step-label">Step 3 — Card Theme</div>', unsafe_allow_html=True)
     theme = st.selectbox(
         "Theme",
@@ -866,7 +866,7 @@ def main():
     )
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # ── Step 4: Generate ──
+   
     st.markdown("")
     col_gen, _ = st.columns([1, 2])
     with col_gen:
@@ -891,7 +891,7 @@ def main():
                     except Exception as e:
                         st.error(f"Generation failed: {e}")
 
-    # ── Step 5: Preview ──
+    
     if st.session_state.get("show_letter") and st.session_state.get("letter_text"):
         st.markdown("---")
         st.markdown('<div class="step-label" style="font-family:Montserrat,sans-serif;font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,160,200,0.6);margin-bottom:0.8rem;">Step 4 — Your Letter</div>', unsafe_allow_html=True)
@@ -902,7 +902,7 @@ def main():
         )
         components.html(html, height=700, scrolling=True)
 
-        # ── Step 6: Share ──
+       
         st.markdown('<div class="step-card" style="margin-top:1rem;"><div class="step-label">Step 5 — Share Your Letter</div>', unsafe_allow_html=True)
         lid = st.session_state.get("letter_id", "")
         share_url = f"?id={lid}"
@@ -921,7 +921,7 @@ def main():
         st.markdown('</div>', unsafe_allow_html=True)
 
     elif not st.session_state.get("show_letter"):
-        # Demo envelope (empty, decorative)
+        
         st.markdown("---")
         demo_html = """
         <div style="display:flex;justify-content:center;align-items:center;height:160px;opacity:0.35;">
@@ -934,7 +934,7 @@ def main():
         components.html(demo_html, height=160)
 
 
-# ── Init session state ────────────────────────────────────────────────────────
+
 if "show_letter" not in st.session_state:
     st.session_state["show_letter"] = False
 
